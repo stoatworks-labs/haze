@@ -3,9 +3,14 @@ name: release
 # Build the Haze FFGL plugins (a source and an effect) for the two platforms Resolume runs on:
 #   - macOS   -> universal (arm64 + x86_64) "Haze.bundle" and "Haze Over.bundle"
 #   - Windows -> x64 "Haze.dll" and "Haze Over.dll" (GLEW static via vcpkg)
-# Trigger manually (Actions > release > Run workflow) or by pushing a v* tag;
-# a workflow_dispatch run builds both platforms and skips publication, which
-# is the cheap way to prove Windows still compiles.
+# Each platform ships as a zip, with a .dmg for macOS and an installer for
+# Windows. Trigger manually (Actions > release > Run workflow) or by pushing a
+# v* tag.
+#
+# Dispatching this manually is the cheap way to get a Windows build without
+# publishing anything: the release job below is gated on refs/tags/v*, so a
+# workflow_dispatch run builds both platforms and skips publication. That is
+# how the DLLs tested in Arena on win-lab are the ones a tag then ships.
 on:
   workflow_dispatch:
   push:
@@ -23,10 +28,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # macos-14 and never macos-13: the Intel macOS runners are retired,
-          # so x86_64 is cross-compiled from Apple Silicon. CMakeLists.txt's
-          # CMAKE_OSX_ARCHITECTURES does that on its own.
-          - { name: macos-universal, os: macos-14 }
+          # macos-15 (GitHub no longer runs macos-14 jobs) and never macos-13:
+          # the Intel macOS runners are retired, so x86_64 is cross-compiled
+          # from Apple Silicon. CMakeLists.txt's CMAKE_OSX_ARCHITECTURES does
+          # that on its own.
+          - { name: macos-universal, os: macos-15 }
           - { name: windows-x86_64,  os: windows-latest }
     steps:
       - uses: actions/checkout@v7
@@ -35,7 +41,7 @@ jobs:
 
       # Tools off: hztest links against zlib and CGL and is a developer
       # harness, not something that ships. Its checks run locally via
-      # tools/verify.sh.
+      # tools/verify.sh, and the GL-free ones in ci.yml.
       - name: Configure (macOS)
         if: runner.os == 'macOS'
         run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DHAZE_BUILD_TOOLS=OFF
@@ -43,17 +49,34 @@ jobs:
       # GLEW comes from vcpkg, static-linked (static-md keeps the CRT dynamic
       # so the plugin matches the host) so the .dll has no external
       # glew32.dll runtime dependency.
+      #
+      # Applocal off: with a static triplet there is no DLL for vcpkg to copy,
+      # and isohypse's two plugins once raced each other's copy step to an
+      # exit 32. Haze builds two plugins in one tree too.
       - name: Configure (Windows)
         if: runner.os == 'Windows'
         run: >
           cmake -B build -A x64
           -DCMAKE_BUILD_TYPE=Release
           -DHAZE_BUILD_TOOLS=OFF
+          -DVCPKG_APPLOCAL_DEPS=OFF
           -DVCPKG_TARGET_TRIPLET=x64-windows-static-md
           -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
 
       - name: Build
         run: cmake --build build --config Release --parallel
+
+      # The shipped DLLs, loaded as a host loads them: see tools/wincheck.ps1.
+      # -Params is the control table plus the About block (its text and its
+      # buttons); it changes whenever either does. pwsh checks only the LAST
+      # exit code of a step, so each is checked here.
+      - name: Check the DLLs (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          ./tools/wincheck.ps1 -Dll "build/Release/Haze.dll" -Name "SW Haze" -Id HZ01 -Kind source -Params 22
+          if( $LASTEXITCODE ) { exit $LASTEXITCODE }
+          ./tools/wincheck.ps1 -Dll "build/Release/Haze Over.dll" -Name "SW Haze Over" -Id HZ02 -Kind effect -Params 24
+          if( $LASTEXITCODE ) { exit $LASTEXITCODE }
 
       - name: Derive version
         id: ver
@@ -96,6 +119,9 @@ jobs:
             cp "build/Release/Haze.dll" "out/Haze.dll"
             cp "build/Release/Haze Over.dll" "out/Haze Over.dll"
           fi
+          # GLEW and the FFGL SDK are BSD-licensed and built into the binaries,
+          # so their notices travel with them.
+          cp ATTRIBUTIONS.md out/
           ls -R out
 
       - name: Archive (zip)
@@ -137,9 +163,9 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     # makensis cross-compiles, so the installer is wrapped here from the zip
-    # the Windows job uploaded. Its directory page defaults to the common FFGL
-    # folder but stays editable, because Resolume reads plugins from a path
-    # the user chooses per edition.
+    # the Windows job uploaded. --ffgl points its directory page at
+    # Documents\Resolume Arena\Extra Effects, the folder Resolume reads, and
+    # leaves it editable for Avenue's.
     steps:
       - uses: actions/checkout@v7
 
@@ -163,9 +189,10 @@ jobs:
           rm -rf "$stage"; mkdir -p "$stage"
           unzip -q "$zip" -d "$stage"
           cp README.md "$stage/" 2>/dev/null || true
-          # --plain: a plugin needs neither a shortcut nor a PATH entry. It was --cli
-          # until nib#2 (the same fix, carried over), where the unguarded PATH write wiped a system PATH.
-          rl_nsis windows-x86_64 "$stage" --plain
+          # --ffgl: per user, into Documents\Resolume Arena\Extra Effects
+          # (Avenue's where only Avenue is installed), with no shortcut and no
+          # PATH entry.
+          rl_nsis windows-x86_64 "$stage" --ffgl
           ls -l installers
 
       - uses: actions/upload-artifact@v7

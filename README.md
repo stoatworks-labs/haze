@@ -124,7 +124,8 @@ six lenses staring at you white the frame out, as they would.
 
 ## Status
 
-**v0.1.0, 16 November 2026, unreleased, and early days.** It has **never been loaded into
+**v0.1.0, 16 November 2026, public on GitHub since 18 November, not yet released, and early
+days.** It has **never been loaded into
 Resolume** on either platform and never been built on Windows. `oxbow probe` reads the
 bundles as a host does (`SW Haze` / `HZ01` / source, `SW Haze Over` / `HZ02` / effect) and
 `oxbow selftest` renders through each. There's no user guide yet, no OpenFX port and no
@@ -205,7 +206,8 @@ dark clips made dark beams and the clip itself was lost in them.
 ## Build
 
 macOS (universal: Apple Silicon and Intel), from a checkout with its submodule
-(`git submodule update --init --recursive`; the repository is local, with no remote yet):
+(`git clone --recursive https://github.com/stoatworks-labs/haze`, or
+`git submodule update --init --recursive` in an existing clone):
 
 ```bash
 cmake -B build -DCMAKE_BUILD_TYPE=Release

@@ -2,15 +2,15 @@ name: ci
 
 # A `pull_request` trigger from the first commit, so a Dependabot bump has a
 # status check to gate its merge on (ferrofluid ran without one for months).
-# Written, never run: the repo has no remote yet. Enable it only if the repo is
-# public (the machine's rule: Actions minutes on private repos are shared and
-# scarce).
+# The repo is public, so Actions minutes are free; a private copy must never
+# enable it (the machine's rule: private repos share one small allowance).
 #
 # macOS and Windows. The CMakeLists branches on APPLE and WIN32 and has no
 # Linux path at all, so ubuntu is not an option. The Windows job is pitch's,
 # adapted: a GLEW-shaped break is one macOS is structurally blind to, because
-# macOS never links GLEW. (Haze has never been built on Windows; this job is
-# the first place it would be.)
+# macOS never links GLEW. It also loads both DLLs as a host does
+# (tools/wincheck.ps1), so a missing runtime or a constructor that throws fails
+# here rather than in Arena.
 #
 # The macOS runner cannot create an accelerated GL context, so the harness runs
 # `hztest --offline`: every check hztest's main() marks as needing no GL, and
@@ -26,7 +26,7 @@ on:
 jobs:
   macos:
     name: macOS
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v7
         with:
@@ -91,16 +91,26 @@ jobs:
       - name: Configure
         # The toolchain path MUST stay double-quoted: a `run:` step on Windows
         # is PowerShell, and unquoted this expands to nothing. Tools off: hztest
-        # links CGL and is macOS-only.
+        # links CGL and is macOS-only. Applocal off: see release.yml.
         run: >
           cmake -B build -A x64
           -DCMAKE_BUILD_TYPE=Release
           -DHAZE_BUILD_TOOLS=OFF
+          -DVCPKG_APPLOCAL_DEPS=OFF
           -DVCPKG_TARGET_TRIPLET=x64-windows-static-md
           -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
 
       - name: Build
         run: cmake --build build --config Release --parallel
+
+      - name: The DLLs, as a host sees them
+        # pwsh checks only the LAST exit code of a step: each is checked here.
+        # -Params changes whenever a control or the About block does.
+        run: |
+          ./tools/wincheck.ps1 -Dll "build/Release/Haze.dll" -Name "SW Haze" -Id HZ01 -Kind source -Params 22
+          if( $LASTEXITCODE ) { exit $LASTEXITCODE }
+          ./tools/wincheck.ps1 -Dll "build/Release/Haze Over.dll" -Name "SW Haze Over" -Id HZ02 -Kind effect -Params 24
+          if( $LASTEXITCODE ) { exit $LASTEXITCODE }
 
       - uses: actions/upload-artifact@v7
         with:

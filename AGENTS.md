@@ -66,8 +66,11 @@ before beams do.
   only for s ≤ 1, and `--density` measures both.
 - **Provisional hand copies:** `source/StoatworksAbout*.h` (adapted from xenon's, `guide`
   empty, no user guide exists) and `ATTRIBUTIONS.md`, as graticule did.
-- **The workflows are files only.** `ci.yml` and `release.yml` were sed-adapted from
-  ferrofluid and never run; there's no remote. Enable them only if the repo is public.
+- **The workflows were files only** until the repo went public on 2026-11-18: `ci.yml` and
+  `release.yml` had been sed-adapted from ferrofluid and never run. Before the first push
+  they took xenon's current shape (macos-15, which GitHub still runs; the DLLs loaded by
+  `tools/wincheck.ps1`; ATTRIBUTIONS.md in each zip; the installer's `--ffgl` folder) and
+  isohypse's two-plugin parts (vcpkg's applocal copy off, which two plugins once raced).
 
 ## The traps actually hit
 

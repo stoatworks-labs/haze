@@ -104,11 +104,12 @@ the code departs from it.
 - **Provisional hand copies:** `source/StoatworksAbout*.h` (guide = "", no user guide yet)
   and `ATTRIBUTIONS.md`. Once the project is registered in stoatworks-backend,
   `sync-about.py` and `sync-attributions.py` generate them; edit them there then.
-- **The workflows are files only.** `.github/workflows/ci.yml` and `release.yml` were
-  adapted from ferrofluid and have never run. There's no remote. If the repo goes to GitHub
-  as a private repo, they must not be enabled (the fleet's Actions quota); build and release
-  locally.
-- Local only: `~/dev/haze`, no remote, nothing released, not on the website.
+- **Public at https://github.com/stoatworks-labs/haze since 2026-11-18.** `ci.yml` builds
+  macOS (`hztest --offline`, glslc) and Windows on every push, and loads both DLLs as a host
+  does (`tools/wincheck.ps1`, whose `-Params` changes whenever a control or the About block
+  does); `release.yml` builds both platforms, checks the DLLs the same way and publishes on a
+  `v*` tag. Its macOS assets are unsigned: this Mac's autosign agent signs and notarises the
+  published assets.
 
 ## Not done yet
 - Never loaded in Resolume (either platform); never built on Windows; no host has played
