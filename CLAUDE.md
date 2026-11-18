@@ -111,10 +111,24 @@ the code departs from it.
   `v*` tag. Its macOS assets are unsigned: this Mac's autosign agent signs and notarises the
   published assets.
 
+## Browser demo
+- `demo/` is served at https://haze-demo.stoatworks-labs.com/ by the Worker in
+  `wrangler.toml` (a route, plus a proxied AAAA `100::` record for `haze-demo`: delete the
+  record and the page goes dark while deploys stay green). `.github/workflows/deploy.yml`
+  redeploys it on every push to main; by hand: `cf-run npx wrangler deploy`.
+- `demo/shaders.js` is a copy. After changing a shader, run
+  `python3 demo/tools/check_shaders.py --write`, then `python3 demo/tools/check_shaders.py`;
+  `tools/verify.sh` fails on any drift, in the pieces or in how they are joined.
+- `demo/port.js` is a hand port of Controls.cpp, Motion.cpp and Haze.cpp's CPU half, and
+  nothing checks it but a reader: change it by hand with the C++.
+- `demo/vendor/` is the shared kit (`stoatworks-backend/resolume-demo`); never edit it.
+- The page opens on the plugin's defaults, which do not flash; Audience does. Keep it out of
+  the presets, keep the note at the top, and keep a link that opens on Audience paused.
+
 ## Not done yet
 - Never loaded in Resolume (either platform); never built on Windows; no host has played
   it any music.
-- No user guide, no OpenFX port, no browser demo, no presets.
+- No user guide, no OpenFX port, no presets.
 
 ## Diagnostics
 

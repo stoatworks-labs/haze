@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Haze — browser demo | Stoatworks Labs</title>
+    <meta name="description" content="Try the Haze FFGL source and effect for Resolume in your browser: moving heads in a hazed room, each beam ray-marched through stirred stage haze with Henyey–Greenstein scattering and Beer–Lambert extinction, on servo-limited pan and tilt that chase on the beat. The plugin's own GLSL, ported to WebGL2 unedited, fed by a JavaScript port of its CPU half that only a reader checks. No audio, so Onset never fires. A demo, not the plugin." />
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="./vendor/kit.css" />
+    <link rel="stylesheet" href="./haze.css" />
+    <link rel="canonical" href="https://haze-demo.stoatworks-labs.com/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Stoatworks Labs" />
+    <meta property="og:title" content="Haze — browser demo | Stoatworks Labs" />
+    <meta property="og:description" content="Try the Haze FFGL source and effect for Resolume in your browser: moving heads in a hazed room, each beam ray-marched through stirred stage haze with Henyey–Greenstein scattering and Beer–Lambert extinction, on servo-limited pan and tilt that chase on the beat. The plugin's own GLSL, ported to WebGL2 unedited, fed by a JavaScript port of its CPU half that only a reader checks. No audio, so Onset never fires. A demo, not the plugin." />
+    <meta property="og:url" content="https://haze-demo.stoatworks-labs.com/" />
+    <meta property="og:image" content="https://stoatworks-labs.com/thumbs/haze.png" />
+    <meta property="og:image:width" content="1280" />
+    <meta property="og:image:height" content="720" />
+    <meta property="og:image:alt" content="Haze" />
+    <meta name="twitter:card" content="summary_large_image" />
+  </head>
+  <body>
+    <section class="hz-warning" id="photosensitivity" aria-labelledby="hz-warning-title">
+      <h2 class="hz-warning__title" id="hz-warning-title">Photosensitivity note</h2>
+      <p>
+        <strong>One setting on this page flashes: Pattern Audience.</strong> Every other step
+        it swings every head to look straight into the camera, so the lenses blaze and the
+        picture flares and falls back. Flashing light can trigger seizures in people with
+        photosensitive epilepsy.
+      </p>
+      <p>
+        The page opens on the plugin's own settings, the Fan pattern, which does not flash,
+        and no preset uses Audience. At 120 BPM, Audience on a Step On of Beat flashes
+        past three times a second in part of the picture, which is over the limit broadcast
+        and web guidance (Ofcom's, and WCAG's) puts on a large flash; at 4 a Beat it is past
+        three a second over the whole picture. Every other pattern, at every step rate,
+        measured no flashes. A link that opens on Audience opens paused.
+        <strong>Pause</strong>, under the picture, stops it at once.
+      </p>
+    </section>
+
+    <main id="demo">
+      <noscript>
+        <h1>Haze</h1>
+        <p>
+          Moving heads in a hazed room, for Resolume: an FFGL source and an effect. Each beam
+          is ray-marched through stirred stage haze (Henyey–Greenstein scattering,
+          Beer–Lambert extinction), carries a gobo (or your clip) sharp only at its focus
+          distance, and swings on servo-limited pan and tilt that chase on the beat and
+          arrive late when the tempo is too fast.
+        </p>
+        <p>
+          This demo runs the plugin's shaders and a port of its CPU half in your browser, so
+          it needs JavaScript and WebGL2. The plugin itself, its source and its downloads are
+          on <a href="https://github.com/stoatworks-labs/haze">its repository</a>.
+        </p>
+        <ul>
+          <li><a href="https://stoatworks-labs.com/software/haze/guide/">User guide</a></li>
+          <li><a href="https://github.com/stoatworks-labs/haze">Source on GitHub</a></li>
+        </ul>
+      </noscript>
+    </main>
+
+    <script type="module" src="./plugin.js"></script>
+    <script
+      src="./vendor/support-footer.js"
+      defer
+      data-app="Haze"
+      data-repo="https://github.com/stoatworks-labs/haze"
+      data-note="A browser demo of the plugin's shaders over a port of its CPU half. Nothing you load here leaves your machine."
+    ></script>
+  </body>
+</html>

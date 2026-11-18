@@ -128,8 +128,7 @@ six lenses staring at you white the frame out, as they would.
 days.** It has **never been loaded into
 Resolume** on either platform and never been built on Windows. `oxbow probe` reads the
 bundles as a host does (`SW Haze` / `HZ01` / source, `SW Haze Over` / `HZ02` / effect) and
-`oxbow selftest` renders through each. There's no user guide yet, no OpenFX port and no
-browser demo.
+`oxbow selftest` renders through each. There's no user guide yet and no OpenFX port.
 
 ### Measured offline, on macOS
 
@@ -202,6 +201,16 @@ dark clips made dark beams and the clip itself was lost in them.
   sRGB white, not the lamp's 7,800 K.
 - **One fixture.** Below 4.5° a real Mythos switches to its beam mode and stops imaging the
   gobo; here the gobo is always imaged.
+
+## Browser demo
+
+[haze-demo.stoatworks-labs.com](https://haze-demo.stoatworks-labs.com/) runs both plugins'
+own GLSL in WebGL2, unedited, fed by a JavaScript port of their CPU half (the servo planner
+and its sync, the chase, the stage, the stir's drift and the beat) that only a reader
+checks; SW Haze Over plays the rig in front of a generated clip or one you pick. No audio
+reaches it, so Step On's Onset never fires. It opens on the plugin's defaults, with a
+photosensitivity note at the top for the one pattern that flashes, Audience. It is a demo,
+not the plugin, and the page lists what it leaves out.
 
 ## Build
 

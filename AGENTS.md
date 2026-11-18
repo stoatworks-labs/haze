@@ -327,6 +327,60 @@ builds on the machine:
 less (the Over 0.40 ms at 1080p, twelve beams 0.65): the machine is shared. One GPU only
 (an M4 Max); a small GPU or the software renderer is another matter.
 
+## The browser demo (2026-11-18)
+
+https://haze-demo.stoatworks-labs.com/, from `demo/`, deployed by `wrangler.toml` (a Worker
+route: the zone is at Cloudflare's 100 custom domains, so `haze-demo` is a proxied AAAA
+`100::` record made through the API) and `.github/workflows/deploy.yml` on every push to
+main. Both plugins on one page: the kit's Plugin dropdown is SW Haze or SW Haze Over, and
+`?plugin=over` opens the Over.
+
+- **The GPU half is the plugin's.** `demo/shaders.js` is spliced from `Shaders.cpp` by
+  `demo/tools/check_shaders.py --write`; the same script (run by `tools/verify.sh`) fails
+  if a character drifts, if Shaders.cpp grows a piece it does not list, if `Assemble()` or
+  InitGL join the pieces differently, or if `render.js` stops joining them the same way.
+  `render.js` uses the plugin's buffers (R16F atlas, mipmapped RGBA16F gobo, RGBA32F air at
+  Quality's raster), units and uniforms. WebGL2 needs EXT_color_buffer_float (without it the
+  page stops and says so) and OES_texture_float_linear for a linear RGBA32F air buffer
+  (without it the air buffer is RGBA16F and the line under the picture says so).
+- **The CPU half is a port, and only a reader checks it.** `demo/port.js`: Controls.cpp
+  whole, Motion.cpp whole (stage, camera, Plan and the sync's bisection, Yoke, Aim, Lean
+  with Random's splitmix64 in BigInt, the chase), and Haze.cpp's CPU half (the clock's dt
+  and its cap, the beat, the stir's offsets, the uniforms as floats). It was compared once
+  with the C++ when written: a scratch printer linking Controls.cpp and Motion.cpp, with
+  ProcessOpenGL's glue and sceneUniforms' casts copied line for line, against the same
+  printout from port.js, over every control row, both host orders, every conversion on
+  1,005 host values and the inverses, and ten runs (3,060 frames: every pattern, every
+  Step On but Onset, 40/41/90/120/128/140/174 BPM, 30/50/60 fps with a jittery clock, a
+  stall, mid-run changes of count, layout, speed and pattern, Step presses). Every step
+  count and step time the same, every conversion equal, every pose within 4e-14 relative
+  (libm's and V8's sin, cos and atan2 differ in the last ulps), every float the GPU is
+  handed bit-identical but near-zero vector components (1e-17 against 0, at most 1.1e-16
+  apart). The one structural difference is meant: the port's HostOrder leaves out the
+  About run. That comparison is not in the repository and nothing repeats it. A matched
+  frame (180 frames at 60 fps, 120 BPM, the page's clock driven frame by frame) looks the
+  same as `hztest --out` for the source, the Over on the look card and Arc/Blue/orbit 36°.
+- **What the page stands in for**: Resolume's BPM and bar phase are a Tempo menu (120 by
+  default) and the page's clock, in 4/4; the Over's clip is the kit's generated clips, led
+  by hztest's look card ported to GLSL, or a file the visitor picks (premultiplied, so the
+  plugin's own multiply by alpha makes an edge alpha squared). No audio: Audio is not on
+  the panel, Onset never fires. Step is a toggle released after a frame. Restart and the
+  Plugin dropdown start a new instance with that plugin's defaults. Every gap is listed on
+  the page.
+- **Photosensitivity**: a note at the top of the page, no Start gate. The panel opens on
+  the plugin's defaults (Fan), and no preset uses Audience. A link that opens on Audience
+  opens paused, and while Pattern is Audience a caution sits under the picture. The release
+  measurements behind the note, at 120 BPM: Audience on Beat up to 3 transitions a second
+  over the whole frame and 7 in a third-of-frame window; on 4 a Beat 7 and 9; every other
+  pattern at every step rate 0.
+- **Traps**: headless Chrome draws this with `--use-gl=angle --use-angle=metal` (cdpshot's
+  `GL_FLAGS`), no SwiftShader needed. Paused screenshots of the canvas differ in the bottom
+  three rows by 2 levels from one capture to the next (the clip's rounding, not the render),
+  so compare them with a tolerance. The kit's panel rows have a `display` of their own, so
+  hiding Clip As, Mix and the Clip picker is by inline style, not `hidden`. The noise and
+  gobo programs have no `Hooks` (the compiler drops it there, in the plugin too), so
+  `missing()` lists it for those two.
+
 ## Open questions
 
 - **Is Screen the right default for the Over?** It survives every demo clip; Gobo is the

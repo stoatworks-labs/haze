@@ -52,8 +52,8 @@ reserved_words || fail "a GLSL reserved word is used as an identifier"
 step "GLSL: nothing WebGL2 lacks"
 #---------------------------------------------------------------------------
 # The fleet's browser demos run the shaders unedited in WebGL2 (GLSL ES 3.00),
-# and the kit's port() translates spellings, never maths. Haze has no demo yet;
-# the rule is kept so one can be made without rewriting a shader. These
+# and the kit's port() translates spellings, never maths. Haze's demo
+# (demo/, checked by demo/tools/check_shaders.py below) is one of them. These
 # built-ins arrived in GLSL 4.00 / ES 3.10 and compile everywhere here but
 # there: findMSB was in ferrofluid's panel shader until 2026-10-06.
 if grep -nE '(^|[^A-Za-z_])(findMSB|findLSB|bitCount|bitfieldExtract|bitfieldInsert|bitfieldReverse|uaddCarry|usubBorrow|umulExtended|imulExtended|frexp|ldexp|fma|textureGather|textureQueryLevels|packUnorm4x8|unpackUnorm4x8)[[:space:]]*\(' source/Shaders.cpp | grep -vE '^[0-9]+:[[:space:]]*//' ; then
@@ -65,6 +65,7 @@ echo "   none"
 step "Shaders"
 #---------------------------------------------------------------------------
 tools/glslc.sh || fail "a shader does not compile"
+python3 demo/tools/check_shaders.py || fail "the demo's shaders have drifted from the plugin's"
 
 #---------------------------------------------------------------------------
 step "Mie (where the default anisotropy comes from)"
