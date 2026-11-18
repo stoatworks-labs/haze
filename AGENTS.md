@@ -394,4 +394,12 @@ main. Both plugins on one page: the kit's Plugin dropdown is SW Haze or SW Haze 
 - **The screen's size in frame** (about half the width at the default camera).
 - **Never in Resolume.** Nothing is known about Arena's beat, clock or FFT reaching it, or
   how it reads at a show.
-- **Never built on Windows.** MSVC's `far`/`near` and the GLEW path are untested here.
+- **Windows, answered 2026-11-18:** CI's first MSVC build had no warnings and no source
+  change; both DLLs load in `tools/wincheck.ps1`, and the release.yml dispatch build passed
+  win-lab's Arena gate (Arena 7.27.1, llvmpipe): 15 passed, 0 failed, 4 skipped (audio and
+  Step, an event the gate never presses). The chase and the stir move the picture by
+  themselves, so the expectation holds Step On at Step Only and Stir at 0 in every row
+  (pass 2's floors fell from 15.5 to 0.55 levels); Pattern too, since the chase retargets
+  every frame. Source 16/16 valued controls live, the Over 18/19 (Motor Speed inconclusive:
+  it acts only while the heads move, so it keeps Arena's beat and its noise). Never loaded
+  on macOS: Arena was in use on this Mac during the release.

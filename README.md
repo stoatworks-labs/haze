@@ -2,7 +2,8 @@
 
 > **AI-assisted project.** This codebase was created with [Claude](https://claude.com/claude-code)
 > (Anthropic), directed and reviewed by a human author. It has **never been loaded into
-> Resolume**, on macOS or Windows, and has never been built on Windows. Everything below is
+> Resolume on macOS**. On Windows its release build loads, registers and renders in Resolume
+> Arena 7.27.1 on software rendering, with every control as declared. Everything else below is
 > measured by an offline harness, `hztest`, that drives the real plugin classes in a headless
 > GL context on a synthetic clock, on this Mac's GPU at two rasters and partly on Apple's
 > software renderer, and reads linear radiance straight off the plugin's own float output.
@@ -77,10 +78,11 @@ None of this is drawn. It's the haze and the motors doing what they do.
   scatters 67 times more light straight ahead than at right angles, so a beam seen side-on
   is a faint shaft and the same beam swung toward the camera flares. Its lens, when it
   points straight at you, is the brightest thing in the frame.
-- **Chases late at high BPM.** Sweep at the default Spread swings every head 127° of pan a
-  step. From rest at full speed that takes 1.48 s, so the chase keeps up to 40.6 BPM. At 120
-  BPM the heads turn back long before they arrive, and only 4 of 22 steps ever get there.
-  Slow the tempo or narrow the Spread and they land. Motor Speed scales the motors.
+- **Chases late at high BPM.** Sweep swings every head 127° of pan a step, whatever the
+  Spread (the Spread sets how far the beams lean, not how far the yokes pan). From rest at
+  full speed that takes 1.48 s, so the chase keeps up to 40.6 BPM. At 120 BPM the heads turn
+  back long before they arrive, and only 4 of 22 steps ever get there. Slow the tempo and
+  they land. Motor Speed scales the motors: even at 150% a step takes 0.98 s.
 - **The clip sharp on the wall, smeared along the beam.** The lens images the gobo at the
   Focus distance only. Where the beam meets the back wall at that distance, the gobo (or, in
   the Over, the clip) is sharp; along the beam in the air it's a smear that comes into focus
@@ -124,11 +126,40 @@ six lenses staring at you white the frame out, as they would.
 
 ## Status
 
-**v0.1.0, 16 November 2026, public on GitHub since 18 November, not yet released, and early
-days.** It has **never been loaded into
-Resolume** on either platform and never been built on Windows. `oxbow probe` reads the
-bundles as a host does (`SW Haze` / `HZ01` / source, `SW Haze Over` / `HZ02` / effect) and
-`oxbow selftest` renders through each. There's no user guide yet and no OpenFX port.
+**v0.1.0, released 18 November 2026, and early days.** It has **never been loaded into
+Resolume on macOS**: `oxbow probe` reads the bundles as a host does (`SW Haze` / `HZ01` /
+source, `SW Haze Over` / `HZ02` / effect) and `oxbow selftest` renders through each, and
+that is all. **On Windows both plugins have been in Resolume:** the DLLs `release.yml` built
+from the registered tree load, register and render in Resolume Arena 7.27.1 on software
+rendering (win-lab, Mesa llvmpipe, no GPU, no sound device), with every control as the
+plugins declare it (23 host controls on the source, 26 on the effect with Arena's Opacity)
+and Arena's log clean, in the fleet's Arena gate: 15 of 15 checks, the audio and Step rows
+skipped. With the chase and the stir held still, all 16 of the source's valued controls and
+18 of the effect's 19 changed Arena's picture; Motor Speed read inconclusive on the effect
+(it acts only while the heads move) and none read dead. Software rendering says nothing
+about a GPU or about speed. CI builds both platforms on every push, MSVC with no warnings,
+and loads both DLLs as a host does. There's a [user
+guide](https://stoatworks-labs.com/software/haze/guide/) and a browser demo, but no presets
+and no OpenFX port.
+
+**Photosensitivity.** The defaults don't flash, and nor does any pattern but one.
+**Audience** aims every beam at the camera on every other step and whites out the picture,
+so it flashes: measured from the plugin's own output with the WCAG general-flash rule, at
+120 BPM it's over three flashes a second in part of the picture on Beat and faster (4.5 in
+the worst third of the frame), on the line on 2 Beats, and well under on Bar. The guide has
+the table and how to keep a show within the guidance.
+
+**Open questions**, known limits for now:
+
+- **SW Haze Over's default Clip As is Screen, not Gobo**, though the clip as the gobo is the
+  idea in the name. Screen survived all 21 of Resolume's demo clips; under Gobo a dark clip
+  makes dark beams. Gobo is one click away.
+- **Audience whites the frame out** at the default exposure: six lenses staring at the
+  camera, as they would in a photograph of a show, but maybe not what a VJ picking it from
+  a list expects. Three stops down, the lenses read as stars.
+- **The stir is hard to see**, especially in stills. A finer field or a different control
+  law would show more structure; a Stir above 1 would break the haze's mean.
+- **The clip on the back wall fills about half the frame's width** at the default camera.
 
 ### Measured offline, on macOS
 
@@ -152,7 +183,7 @@ rasters**, 1280×720 and 320×180, and seven of them again on **Apple's software
 | `--alpha` | the Over at Mix 0 returns the clip with **0** of 3,686,400 floats different; its alpha is mix(clip, 1, Mix) to 2.4e-8 in every Clip As; Screen with nothing in front returns the clip through the haze to 1.3e-7; the source's alpha is 1 |
 | `--audio` | seven kicks in the FFT buffer, seven steps, each on its kick's own frame; none from a cold start into loud music |
 | `--clock`, `--resize`, `--state` | at a 499,000,000 ms host clock the frames stay 1/60 s apart to 6e-11 s and the haze drifts by v·dt; a raster change mid-run is **0 bytes** different from a fresh instance; the host's GL state comes back, both plugins |
-| `--names`, `--cues` | 22 and 24 parameters, within FFGL's 16 characters, unique, the About block last; a cue sheet ramps and steps them |
+| `--names`, `--cues` | 23 and 25 parameters, within FFGL's 16 characters, unique, the About block last; a cue sheet ramps and steps them |
 | `--pipe` | both plugins: 2.5 frames in, exactly 2 out; a closed stdout (`\| head -c 1`) exits 1, not 141 |
 | `--negative` | **17** deliberately wrong models, **17** caught |
 | mutation | **26** one-character mutants of the shipped GLSL and C++, **26** caught |
@@ -179,9 +210,9 @@ dark clips made dark beams and the clip itself was lost in them.
 
 ### Not established
 
-- **Resolume.** Never loaded, on either platform, so nothing here is known about how Arena
-  sends its beat, clock or audio to it, or how it looks or performs in a composition.
-- **Windows.** Never built. The CI workflow in `.github/` was written and has never run.
+- **Resolume on macOS, and on a GPU.** Never loaded on macOS. On Windows it has run only on
+  software rendering with no sound device, so nothing is known about Arena's audio reaching
+  it, how it looks on a real GPU, or how it performs in a composition.
 - **Music.** The harness feeds Onset a synthetic kick; no real music has stepped it.
 - **The droplet size is an assumption.** No published size distribution of a hazer's
   output was found. The default g = 0.70 is the Mie asymmetry of light mineral oil droplets
@@ -234,8 +265,8 @@ The last one copies `Haze.bundle` and `Haze Over.bundle` into
 `~/Documents/Resolume Arena/Extra Effects`. Restart Arena and they're under Sources as
 **SW Haze** and under Effects as **SW Haze Over**.
 
-Windows needs Visual Studio 2022 and vcpkg (for GLEW); see `.github/workflows/ci.yml`.
-It has never been built there.
+Windows needs Visual Studio 2022 and vcpkg (for GLEW); see `.github/workflows/ci.yml`,
+which builds it there on every push.
 
 ## Building and testing
 

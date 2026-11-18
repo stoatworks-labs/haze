@@ -3,7 +3,7 @@
 Moving heads in a hazed room, for Resolume Arena/Avenue, as two FFGL plugins from one
 core: single scattering by stage haze (Henyey–Greenstein, Beer–Lambert) ray-marched per
 beam, the clip as the gobo, servo-limited pan/tilt chasing on the beat. C++/GLSL, CMake
-MODULE → universal `.bundle` (macOS) + Windows `.dll` (never built). MIT.
+MODULE → universal `.bundle` (macOS) + Windows `.dll` (CI-built, Arena-gated). MIT.
 
 | | id | display name | bundle | type |
 | --- | --- | --- | --- | --- |
@@ -128,9 +128,16 @@ the code departs from it.
   the presets, keep the note at the top, and keep a link that opens on Audience paused.
 
 ## Not done yet
-- Never loaded in Resolume (either platform); never built on Windows; no host has played
-  it any music.
-- No user guide, no OpenFX port, no presets.
+- Never loaded in Resolume on macOS; on Windows only on software rendering (win-lab's Arena
+  gate, 2026-11-18: 15 passed, 0 failed, 4 skipped; expectation in plugin-bench
+  `arena/expect/haze.json`, which holds Step On at Step Only and Stir at 0 so the picture
+  stands still). No host has played it any music.
+- No OpenFX port, no presets. The user guide is `docs/USER-GUIDE.md` (built to the site and
+  `docs/USER-GUIDE.pdf` by the website's `build_guides.py haze`).
+- **Audience flashes** (the lenses white out the frame every other step): over 3 flashes a
+  second in part of the picture on Beat and faster at 120 BPM, on the line on 2 Beats. The
+  guide, the demo page, the video and the reel all carry the warning; the defaults and every
+  other pattern measure 0.
 
 ## Diagnostics
 
