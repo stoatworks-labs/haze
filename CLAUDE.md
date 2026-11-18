@@ -101,9 +101,11 @@ the code departs from it.
 - `haze_core` is an OBJECT library: each plugin registers itself from a file-scope
   constructor nothing references.
 - The macOS build must be universal. Check with `lipo`, never the build log.
-- **Provisional hand copies:** `source/StoatworksAbout*.h` (guide = "", no user guide yet)
-  and `ATTRIBUTIONS.md`. Once the project is registered in stoatworks-backend,
-  `sync-about.py` and `sync-attributions.py` generate them; edit them there then.
+- **Generated, never edit here:** `source/StoatworksAbout.h` (stoatworks-backend's
+  `sync-about.py`, from the website's projects.json: the guide button makes the About block
+  23 and 25 parameters), `ATTRIBUTIONS.md` and the README's attributions block
+  (`sync-attributions.py`, from `attributions/derived.json`), `.github/FUNDING.yml` and the
+  issue forms. Registered 2026-11-18.
 - **Public at https://github.com/stoatworks-labs/haze since 2026-11-18.** `ci.yml` builds
   macOS (`hztest --offline`, glslc) and Windows on every push, and loads both DLLs as a host
   does (`tools/wincheck.ps1`, whose `-Params` changes whenever a control or the About block

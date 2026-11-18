@@ -64,8 +64,10 @@ before beams do.
 - **Stir is s = the control (0..1), not more.** A Stir of 2 was tried for visibility and
   reverted: n's range is [−1, 1], so σ̄(1 + s·n) stays ≥ 0 and keeps the room's mean at σ̄
   only for s ≤ 1, and `--density` measures both.
-- **Provisional hand copies:** `source/StoatworksAbout*.h` (adapted from xenon's, `guide`
-  empty, no user guide exists) and `ATTRIBUTIONS.md`, as graticule did.
+- **Provisional hand copies, until registration:** `source/StoatworksAbout*.h` (adapted from
+  xenon's, `guide` empty) and `ATTRIBUTIONS.md`, as graticule did. Registered on 2026-11-18:
+  `sync-about.py` and `sync-attributions.py` generate both now, and the guide button took the
+  About block to 23 and 25 parameters.
 - **The workflows were files only** until the repo went public on 2026-11-18: `ci.yml` and
   `release.yml` had been sed-adapted from ferrofluid and never run. Before the first push
   they took xenon's current shape (macos-15, which GitHub still runs; the DLLs loaded by
